@@ -2,6 +2,18 @@ const
     {EventEmitter} = require('events'),
     {spawn, exec} = require('child_process'),
 
+    demo = async () => {
+        const xEventEmitter = await createXEventEmitter()
+
+        xEventEmitter.on('press', console.log)
+
+        xEventEmitter.on('release', console.log)
+
+        xEventEmitter.on('error', console.error)
+
+        xEventEmitter.on('close', code => console.log(`close: ${code}`))
+    },
+
     createXEventEmitter = async () => {
         const
             xEventEmitter = new EventEmitter(),
@@ -57,4 +69,7 @@ const
     }
 
 
-module.exports = createXEventEmitter
+if (require.main === module)
+    demo()
+else
+    module.exports = createXEventEmitter
