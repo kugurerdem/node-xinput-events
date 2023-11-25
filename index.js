@@ -64,13 +64,19 @@ const
 
         xinputKeyboardListenProcesses.forEach(ps => {
             ps.stdout.on('data', data => {
-                const
-                    ln =
-                        data.toString().replace(/\n/g, '').replace(/\s+/g, ' '),
+                const lns = data.toString().split('\n')
 
-                    [_, type, keycode] = ln.split(' ')
+                if (lns[lns.length - 1] == '')
+                    lns.pop()
 
-                xEventEmitter.emit(type, keycode)
+                lns.forEach(ln => {
+                    const
+                        parsedLn = ln.replace(/\n/g, '').replace(/\s+/g, ' '),
+
+                        [_, type, keycode] = parsedLn.split(' ')
+
+                    xEventEmitter.emit(type, keycode)
+                })
             })
 
             ps.stderr.on('data', data => {
