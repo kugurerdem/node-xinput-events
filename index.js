@@ -18,6 +18,29 @@ const
         const
             xEventEmitter = new EventEmitter(),
 
+            xKeySymsByKeyCode = await new Promise((resolve, reject) =>
+                exec('xmodmap -pke', (error, stdout, stderr) => {
+                    if (error)
+                        reject(error)
+
+                    const xKeySymsByKeyCode = stdout.split('\n')
+                        .filter(ln => ln.includes(' = '))
+                        .map(line => {
+                            const
+                                [keycode, keySyms] = line.split(' = '),
+                                [keySym, ...restKeySyms] = keySyms.split(' ')
+
+                            return {
+                                keycode,
+                                keySym,
+                                keySyms: [keySym, ...restKeySyms],
+                            }
+                        })
+
+                    resolve(xKeySymsByKeyCode)
+                })
+            ),
+
             xinputKeyboardDeviceIds = await new Promise((resolve, reject) =>
                 exec('xinput --list', (error, stdout, stderr) => {
                     if (error)
