@@ -43,9 +43,9 @@ const
             ps.stdout.on('data', data => {
                 const
                     ln =
-                        data.toString().replace(/\n/g, '').replace(/\s+/g, '')
+                        data.toString().replace(/\n/g, '').replace(/\s+/g, ' '),
 
-                    [_, type, keycode] = ln.replace(/\s+/g, ' ').split(' ')
+                    [_, type, keycode] = ln.split(' ')
 
                 xEventEmitter.emit(type, keycode)
             })
