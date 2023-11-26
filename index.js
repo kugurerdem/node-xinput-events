@@ -2,6 +2,8 @@ const
     {EventEmitter} = require('events'),
     {spawn, exec} = require('child_process'),
 
+    {assign, fromEntries} = Object,
+
     demo = async () => {
         const xEventEmitter = await createXEventEmitter()
 
@@ -23,21 +25,21 @@ const
                     if (error)
                         reject(error)
 
-                    const xKeySymsByKeyCode = stdout.split('\n')
+                    const xKeySymsByKeyCodeEntries = stdout.split('\n')
                         .filter(ln => ln.includes(' = '))
                         .map(line => {
                             const
-                                [keycode, keySyms] = line.split(' = '),
-                                [keySym, ...restKeySyms] = keySyms.split(' ')
+                                [lhs, keySyms] = line.split(' = '),
+                                [keySym, ...restKeySyms] = keySyms.split(' '),
+                                keycode = lhs.match(/(\d+)/)[1]
 
-                            return {
+                            return [
                                 keycode,
-                                keySym,
-                                keySyms: [keySym, ...restKeySyms],
-                            }
+                                {keySym, keySyms: [keySym, ...restKeySyms]},
+                            ]
                         })
 
-                    resolve(xKeySymsByKeyCode)
+                    resolve(fromEntries(xKeySymsByKeyCodeEntries))
                 })
             ),
 
@@ -73,9 +75,12 @@ const
                     const
                         parsedLn = ln.replace(/\n/g, '').replace(/\s+/g, ' '),
 
-                        [_, type, keycode] = parsedLn.split(' ')
+                        [_, type, keycode] = parsedLn.split(' '),
 
-                    xEventEmitter.emit(type, keycode)
+                        xEvent = {keycode}
+
+                    assign(xEvent, xKeySymsByKeyCode[keycode])
+                    xEventEmitter.emit(type, xEvent)
                 })
             })
 
