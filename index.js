@@ -5,11 +5,14 @@ const
     {assign, fromEntries} = Object,
 
     demo = async () => {
-        const xEventEmitter = await createXEventEmitter()
+        const
+            xEventEmitter = await createXEventEmitter()
 
-        xEventEmitter.on('press', console.log)
+        xEventEmitter.on('press',
+            (e) => console.log(`press: ${e.keycode} ${e.keySym}`))
 
-        xEventEmitter.on('release', console.log)
+        xEventEmitter.on('release',
+            (e) => console.log(`release: ${e.keycode} ${e.keySym}`))
 
         xEventEmitter.on('error', console.error)
 
